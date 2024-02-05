@@ -1,8 +1,4 @@
-"""
-Generator of CycleGAN model,
-architecture is the same as in the original paper
-"""
-import torch
+
 import torch.nn as nn
 
 
@@ -54,6 +50,10 @@ class ResidualBlock(nn.Module):
 
 
 class Generator(nn.Module):
+    """
+    Generator of CycleGAN model,
+    architecture is the same as in the original paper
+    """
     def __init__(self, in_channels: int = 3,
                  filters: int = 64,
                  num_resid: int = 6):
