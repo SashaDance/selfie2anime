@@ -13,12 +13,15 @@ class DownConvLayer(nn.Module):
 
         self.conv = nn.Sequential(
             nn.Conv2d(
-                in_channels, out_channels, padding_mode='reflect', **kwargs
+                in_channels, out_channels, kernel_size,
+                padding_mode='reflect',**kwargs
             ),
             nn.InstanceNorm2d(out_channels),
             nn.ReLU() if activation else nn.Identity()
         )
 
+    def forward(self, x):
+        return self.conv(x)
 
 class UpConvLayer(nn.Module):
     def __init__(self, in_channels: int, out_channels: int,
@@ -26,7 +29,8 @@ class UpConvLayer(nn.Module):
         super().__init__()
 
         self.conv = nn.Sequential(
-            nn.ConvTranspose2d(in_channels, out_channels, kernel_size),
+            nn.ConvTranspose2d(
+                in_channels, out_channels, kernel_size, **kwargs),
             nn.InstanceNorm2d(out_channels),
             nn.ReLU() if activation else nn.Identity()
         )
@@ -97,3 +101,5 @@ class Generator(nn.Module):
         x = self.up_conv1(x)
 
         x = self.last(x)
+
+        return x
