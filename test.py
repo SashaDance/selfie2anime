@@ -1,5 +1,6 @@
 from dataset import ImageDataset
 import torch
+from generator import Generator
 
 
 def test_image_dataset(in_channels:int = 3, image_size: int = 128) -> None:
@@ -25,8 +26,19 @@ def test_image_dataset(in_channels:int = 3, image_size: int = 128) -> None:
         f'Incorrect image shape: got {list(anime_test[0].shape)}, expected: {img_shape}'
 
 
+def test_generator(in_channels:int = 3, image_size: int = 128,
+                   batch_size: int = 3) -> None:
+    x = torch.randn(size=[batch_size, in_channels, image_size, image_size])
+    generator = Generator(in_channels=in_channels)
+
+    output = generator(x)
+    assert list(x.shape) == list(output.shape), \
+        f'Incorrect output shape: got {list(output.shape)}, expected {list(x.shape)}'
+
+
 def main() -> None:
     test_image_dataset()
+    test_generator()
 
 
 if __name__ == '__main__':
