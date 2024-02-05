@@ -1,4 +1,3 @@
-
 import torch.nn as nn
 
 
@@ -10,7 +9,7 @@ class DownConvLayer(nn.Module):
         self.conv = nn.Sequential(
             nn.Conv2d(
                 in_channels, out_channels, kernel_size,
-                padding_mode='reflect',**kwargs
+                padding_mode='reflect', **kwargs
             ),
             nn.InstanceNorm2d(out_channels),
             nn.ReLU() if activation else nn.Identity()
@@ -18,6 +17,7 @@ class DownConvLayer(nn.Module):
 
     def forward(self, x):
         return self.conv(x)
+
 
 class UpConvLayer(nn.Module):
     def __init__(self, in_channels: int, out_channels: int,
@@ -54,6 +54,7 @@ class Generator(nn.Module):
     Generator of CycleGAN model,
     architecture is the same as in the original paper
     """
+
     def __init__(self, in_channels: int = 3,
                  filters: int = 64,
                  num_resid: int = 6):
