@@ -33,7 +33,7 @@ def test_generator(in_channels:int = 3, image_size: int = 128,
 
     output = generator(x)
     assert list(x.shape) == list(output.shape), \
-        f'Incorrect output shape: got {list(output.shape)}, expected {list(x.shape)}'
+        f'Input and output shapes should be the same: got {list(output.shape)}, expected {list(x.shape)}'
 
 
 def main() -> None:
