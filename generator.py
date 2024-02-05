@@ -47,3 +47,53 @@ class ResidualBlock(nn.Module):
 
     def forward(self, x):
         return x + self.resid(x)  # skip connection
+
+
+class Generator(nn.Module):
+    def __init__(self, in_channels: int = 3,
+                 filters: int = 64,
+                 num_resid: int = 6):
+        super().__init__()
+        self.down_conv0 = DownConvLayer(
+            in_channels, filters, 7, padding=3, stride=1
+        )
+        self.down_conv1 = DownConvLayer(
+            filters, filters * 2, 3, padding=1, stride=2
+        )
+        self.down_conv2 = DownConvLayer(
+            filters * 2, filters * 4, 3, padding=1, stride=2
+        )
+
+        self.resid_blocks = nn.Sequential(
+            *[ResidualBlock(filters * 4) for _ in range(num_resid)]
+        )
+
+        self.up_conv0 = UpConvLayer(
+            filters * 4, filters * 2, 3, padding=1, stride=2, output_padding=1
+        )
+        self.up_conv1 = UpConvLayer(
+            filters * 2, filters, 3, padding=1, stride=2, output_padding=1
+        )
+
+        self.last = nn.Sequential(
+            nn.Conv2d(
+                filters, in_channels, 7, stride=1,
+                padding=3, padding_mode='reflect'
+            ),
+            nn.Tanh()
+        )
+
+    def forward(self, x):
+        # downsampling
+        x = self.down_conv0(x)
+        x = self.down_conv1(x)
+        x = self.down_conv2(x)
+
+        # residual blocks
+        x = self.resid_blocks(x)
+
+        # upsampling
+        x = self.up_conv0(x)
+        x = self.up_conv1(x)
+
+        x = self.last(x)
