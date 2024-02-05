@@ -1,6 +1,7 @@
 from dataset import ImageDataset
 import torch
 from generator import Generator
+from discriminator import Discriminator
 
 
 def test_image_dataset(in_channels:int = 3, image_size: int = 128) -> None:
@@ -36,9 +37,20 @@ def test_generator(in_channels:int = 3, image_size: int = 128,
         f'Input and output shapes should be the same: got {list(output.shape)}, expected {list(x.shape)}'
 
 
+def test_discriminator(in_channels:int = 3, image_size: int = 128,
+                       batch_size: int = 3) -> None:
+    x = torch.randn(size=[batch_size, in_channels, image_size, image_size])
+    discriminator = Discriminator(in_channels=in_channels)
+
+    output = discriminator(x)
+    assert list(output.shape)[1] == 1, \
+        f'Incorrect output shape: output must have 1 channel, got: {list(output.shape)[1]}'
+
+
 def main() -> None:
     test_image_dataset()
     test_generator()
+    test_discriminator()
 
 
 if __name__ == '__main__':
