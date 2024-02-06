@@ -29,8 +29,10 @@ class ImageDataset(Dataset):
     def __len__(self) -> int:
         return len(self.images_path)
 
-    def __getitem__(self, index) -> torch.Tensor:
-        image_path = self.images_path[index]
+    def __getitem__(self, key):
+        if isinstance(key, slice):
+            return [self[ind] for ind in range(key.start, key.stop)]
+        image_path = self.images_path[key]
         image = Image.open(image_path).convert('RGB')
 
         image_transformed = self.transform(image)
