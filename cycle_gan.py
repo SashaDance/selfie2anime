@@ -195,3 +195,4 @@ class CycleGAN:
 
         # TODO: implement training loop for loaders with different sizes
         # TODO: add calculating val losses
+        # TODO: implement buffer

@@ -1,10 +1,15 @@
 from dataset import ImageDataset
-import torch
 from generator import Generator
 from discriminator import Discriminator
+from cycle_gan import CycleGAN
+import config
+
+import torch
+import os
+from torch.utils.data import DataLoader
 
 
-def test_image_dataset(in_channels:int = 3, image_size: int = 128) -> None:
+def test_image_dataset(in_channels: int = 3, image_size: int = 128) -> None:
     female_tr = ImageDataset('trainA')
     anime_tr = ImageDataset('trainB')
     female_test = ImageDataset('testA')
@@ -27,7 +32,7 @@ def test_image_dataset(in_channels:int = 3, image_size: int = 128) -> None:
         f'Incorrect image shape: got {list(anime_test[0].shape)}, expected: {img_shape}'
 
 
-def test_generator(in_channels:int = 3, image_size: int = 128,
+def test_generator(in_channels: int = 3, image_size: int = 128,
                    batch_size: int = 3) -> None:
     x = torch.randn(size=[batch_size, in_channels, image_size, image_size])
     generator = Generator(in_channels=in_channels)
@@ -37,7 +42,7 @@ def test_generator(in_channels:int = 3, image_size: int = 128,
         f'Input and output shapes should be the same: got {list(output.shape)}, expected {list(x.shape)}'
 
 
-def test_discriminator(in_channels:int = 3, image_size: int = 128,
+def test_discriminator(in_channels: int = 3, image_size: int = 128,
                        batch_size: int = 3) -> None:
     x = torch.randn(size=[batch_size, in_channels, image_size, image_size])
     discriminator = Discriminator(in_channels=in_channels)
@@ -47,10 +52,46 @@ def test_discriminator(in_channels:int = 3, image_size: int = 128,
         f'Incorrect output shape: output must have 1 channel, got: {list(output.shape)[1]}'
 
 
+def test_train_loop(left_ind: int = 0,
+                    right_ind: int = 5,
+                    epochs: int = 10) -> None:
+    female_tr = ImageDataset('trainA')
+    anime_tr = ImageDataset('trainB')
+
+    loader_x = DataLoader(female_tr[left_ind: right_ind])
+    loader_y = DataLoader(anime_tr[left_ind: right_ind])
+
+    device = (
+        torch.device('cuda') if torch.cuda.is_available()
+        else torch.device('cpu')
+    )
+
+    model = CycleGAN(device)
+
+    discriminator_params = (
+            list(model.dis_X.parameters()) + list(model.dis_Y.parameters())
+    )
+    generator_params = (
+            list(model.gen_XY.parameters()) + list(model.gen_YX.parameters())
+    )
+    optimizers = {
+        'discriminator': torch.optim.Adam(
+            discriminator_params, lr=config.LEARNING_RATE, betas=config.BETAS
+        ),
+        'generator': torch.optim.Adam(
+            generator_params, lr=config.LEARNING_RATE, betas=config.BETAS
+        )
+    }
+
+    losses = model.train(epochs, optimizers, loader_x, loader_y)
+    print(losses)
+
+
 def main() -> None:
     test_image_dataset()
     test_generator()
     test_discriminator()
+    test_train_loop()
 
 
 if __name__ == '__main__':
