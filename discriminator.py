@@ -20,6 +20,8 @@ class ConvLayer(nn.Module):
 
     def forward(self, x):
         return self.conv(x)
+
+
 class Discriminator(nn.Module):
     """
     Discriminator of CycleGAN model,
@@ -64,4 +66,3 @@ class Discriminator(nn.Module):
         x = self.last(x)
 
         return x
-
