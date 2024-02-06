@@ -35,38 +35,43 @@ class CycleGAN:
 
         # discriminator X
 
-        # predictions of discriminator on real x images
+        # teaching discriminator to detect real images
         real_x_preds = self.dis_X(x_batch)
-        # calculating MSE loss for real x images
-        real_x_loss = torch.mean((real_x_preds - 1) ** 2)  # 1 is for the real images
 
-        # predictions of discriminator on fake x images
+        real_x_loss = torch.mean(
+            (real_x_preds - 1) ** 2  # 1 is for the real images
+        )
+
+        # teaching discriminator to detect fake images
         fake_x = self.gen_XY(x_batch)
         fake_x_preds = self.dis_X(fake_x)
-        # calculating MSE loss for fake x images
-        fake_x_loss = torch.mean((fake_x_preds - 0) ** 2)  # 0 is for the real images
 
-        # updating weights for X discriminator
+        fake_x_loss = torch.mean(
+            (fake_x_preds - 0) ** 2  # 0 is for the real images
+        )
+
+        # updating weights for discriminator
         loss_x = real_x_loss + fake_x_loss
         loss_x.backward()
         optimizer.step()
 
         # discriminator Y
 
-        # predictions of discriminator on real y images
+        # teaching discriminator to detect real images
         real_y_preds = self.dis_Y(y_batch)
-        # calculating MSE loss for real y images
         real_y_loss = torch.mean(
-            (real_y_preds - 1) ** 2)  # 1 is for the real images
+            (real_y_preds - 1) ** 2  # 1 is for the real images
+        )
 
-        # predictions of discriminator on fake y images
+        # teaching discriminator to detect fake images
         fake_y = self.gen_YX(y_batch)
         fake_y_preds = self.dis_Y(fake_y)
-        # calculating MSE loss for fake y images
-        fake_y_loss = torch.mean(
-            (fake_y_preds - 0) ** 2)  # 0 is for the real images
 
-        # updating weights for Y discriminator
+        fake_y_loss = torch.mean(
+            (fake_y_preds - 0) ** 2  # 0 is for the real images
+        )
+
+        # updating weights for discriminator
         loss_y = real_y_loss + fake_y_loss
         loss_y.backward()
         optimizer.step()
@@ -77,6 +82,12 @@ class CycleGAN:
                          x_batch: torch.Tensor,
                          y_batch: torch.Tensor) -> torch.Tensor:
         optimizer.zero_grad()
+
+        # generator from X to Y
+
+        # teaching generator to 'fool' discriminator
+        fake_x = self.gen_XY(x_batch)
+
 
         return torch.Tensor()
 
