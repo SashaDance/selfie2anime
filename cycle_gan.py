@@ -156,19 +156,29 @@ class CycleGAN:
     def train(self, epochs: int,
               optimizers: dict[str, Optimizer],
               train_loader_x: DataLoader,
-              train_loader_y: DataLoader) -> None:
-        losses = {}
+              train_loader_y: DataLoader) -> dict[str, list]:
+
+        losses = {
+            'loss_x_dis': [],
+            'loss_y_dis': [],
+            'loss_gen': []
+        }
 
         for epoch in range(epochs):
             for x_batch, y_batch in tqdm(zip(train_loader_y, train_loader_x)):
                 x_batch = x_batch.to(self.device)
                 y_batch = y_batch.to(self.device)
 
-                self.__discriminator_step(
+                loss_x_d, loss_y_d = self.__discriminator_step(
                     optimizers['discriminator'], x_batch, y_batch
                 )
-                self.__generator_step(
+                loss_gen = self.__generator_step(
                     optimizers['generator'], x_batch, y_batch
                 )
 
-                # TODO: save losses
+                # saving losses
+                losses['loss_x_dis'].append(loss_x_d)
+                losses['loss_y_dis'].append(loss_y_d)
+                losses['loss_gen'].append(loss_gen)
+
+        return losses
