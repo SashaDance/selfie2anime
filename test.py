@@ -83,7 +83,7 @@ def test_train_loop(left_ind: int = 0,
         )
     }
 
-    losses = model.train(epochs, optimizers, loader_x, loader_y)
+    losses = model.train(epochs, 1, optimizers, loader_x, loader_y)
     print(losses)
 
 

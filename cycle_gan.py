@@ -2,6 +2,7 @@ from discriminator import Discriminator
 from generator import Generator
 import config
 
+import os
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from torch.optim import Optimizer
@@ -154,9 +155,18 @@ class CycleGAN:
         return loss.item()
 
     def train(self, epochs: int,
+              save_rate: int,
               optimizers: dict[str, Optimizer],
               train_loader_x: DataLoader,
-              train_loader_y: DataLoader) -> dict[str, list]:
+              train_loader_y: DataLoader,) -> dict[str, list]:
+        """
+        :param epochs:
+        :param save_rate: save model every save_rate epochs
+        :param optimizers:
+        :param train_loader_x:
+        :param train_loader_y:
+        :return: dict with losses
+        """
 
         losses = {
             'loss_x_dis': [],
@@ -185,6 +195,26 @@ class CycleGAN:
                 loss_x_d += loss_x_d_batch
                 loss_y_d += loss_y_d_batch
                 loss_gen += loss_gen_batch
+
+            # saving model checkpoint
+            if epoch % save_rate == 0:
+                os.mkdir(os.path.join(config.SAVE_PATH, f'epoch_{epoch}'))
+                torch.save(
+                    self.dis_X.state_dict(),
+                    os.path.join(config.SAVE_PATH, f'epoch_{epoch}/dis_X')
+                )
+                torch.save(
+                    self.dis_Y.state_dict(),
+                    os.path.join(config.SAVE_PATH, f'epoch_{epoch}/dis_Y')
+                )
+                torch.save(
+                    self.gen_XY.state_dict(),
+                    os.path.join(config.SAVE_PATH, f'epoch_{epoch}/gen_XY')
+                )
+                torch.save(
+                    self.gen_YX.state_dict(),
+                    os.path.join(config.SAVE_PATH, f'epoch_{epoch}/gen_YX')
+                )
 
             # saving losses
             losses['loss_x_dis'].append(loss_x_d / len(train_loader_y))
