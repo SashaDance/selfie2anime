@@ -1,5 +1,6 @@
 from discriminator import Discriminator
 from generator import Generator
+import config
 
 from tqdm import tqdm
 from torch.utils.data import DataLoader
@@ -28,9 +29,30 @@ class CycleGAN:
         # discriminator of Y images
         self.dis_Y = Discriminator(in_channels, filters)
 
+    @staticmethod
+    def cycle_consistency_loss(reconstructed: torch.Tensor,
+                                real: torch.Tensor) -> torch.Tensor:
+        """
+        We want mapping (generators) F from X to Y and G from X to Y
+        to be inverses to each other: F^(-1) = G and G^(-1) = F
+
+        :param reconstructed: gen_YX((gen_XY(x))) for x images
+                              and gen_XY((gen_YX(y))) for y images
+        :param real: real image
+        :return: L1 loss between real and reconstructed images
+        """
+
+        return torch.mean(torch.abs(real - reconstructed))
+
     def __discriminator_step(self, optimizer: Optimizer,
                              x_batch: torch.Tensor,
-                             y_batch: torch.Tensor) -> torch.Tensor:
+                             y_batch: torch.Tensor) -> list[float, float]:
+        """
+        :param optimizer: optimizer with weights from both discriminators
+        :param x_batch:
+        :param y_batch:
+        :return: losses
+        """
         optimizer.zero_grad()
 
         # discriminator X
@@ -47,7 +69,7 @@ class CycleGAN:
         fake_x_preds = self.dis_X(fake_x)
 
         fake_x_loss = torch.mean(
-            (fake_x_preds - 0) ** 2  # 0 is for the real images
+            (fake_x_preds - 0) ** 2  # 0 is for the fake images
         )
 
         # updating weights for discriminator
@@ -68,7 +90,7 @@ class CycleGAN:
         fake_y_preds = self.dis_Y(fake_y)
 
         fake_y_loss = torch.mean(
-            (fake_y_preds - 0) ** 2  # 0 is for the real images
+            (fake_y_preds - 0) ** 2  # 0 is for the fake images
         )
 
         # updating weights for discriminator
@@ -76,20 +98,60 @@ class CycleGAN:
         loss_y.backward()
         optimizer.step()
 
-        return torch.Tensor()
+        return [loss_x.item(), loss_y.item()]
 
     def __generator_step(self, optimizer: Optimizer,
                          x_batch: torch.Tensor,
-                         y_batch: torch.Tensor) -> torch.Tensor:
+                         y_batch: torch.Tensor) -> float:
+        """
+        :param optimizer: optimizer with weights from both generators
+        :param x_batch:
+        :param y_batch:
+        :return: losses
+        """
         optimizer.zero_grad()
 
         # generator from X to Y
 
         # teaching generator to 'fool' discriminator
         fake_x = self.gen_XY(x_batch)
+        fake_x_preds = self.dis_X(fake_x)
 
+        fake_x_loss = torch.mean(
+            (fake_x_preds - 1) ** 2  # 1 is for the real images
+        )
 
-        return torch.Tensor()
+        # calculating cycle consistency loss
+        consistency_loss_x = self.cycle_consistency_loss(
+            self.gen_YX(fake_x), x_batch
+        )
+
+        # generator from Y to X
+
+        # teaching generator to 'fool' discriminator
+        fake_y = self.gen_YX(y_batch)
+        fake_y_preds = self.dis_Y(fake_y)
+
+        fake_y_loss = torch.mean(
+            (fake_y_preds - 1) ** 2  # 1 is for the real images
+        )
+
+        # calculating cycle consistency loss
+        consistency_loss_y = self.cycle_consistency_loss(
+            self.gen_XY(fake_y), y_batch
+        )
+
+        loss = (
+            fake_x_loss
+            + fake_y_loss
+            + consistency_loss_x
+            + consistency_loss_y
+        )
+
+        loss.backward()
+        optimizer.step()
+
+        return loss.item()
 
     def train(self, epochs: int,
               optimizers: dict[str, Optimizer],
