@@ -163,22 +163,35 @@ class CycleGAN:
             'loss_y_dis': [],
             'loss_gen': []
         }
+        assert len(train_loader_x) == len(train_loader_y), \
+            f'Loaders of x and y should be the same size'
 
         for epoch in range(epochs):
+            loss_x_d = 0
+            loss_y_d = 0
+            loss_gen = 0
             for x_batch, y_batch in tqdm(zip(train_loader_y, train_loader_x)):
                 x_batch = x_batch.to(self.device)
                 y_batch = y_batch.to(self.device)
 
-                loss_x_d, loss_y_d = self.__discriminator_step(
+                # updating weights and calculating losses
+                loss_x_d_batch, loss_y_d_batch = self.__discriminator_step(
                     optimizers['discriminator'], x_batch, y_batch
                 )
-                loss_gen = self.__generator_step(
+                loss_gen_batch = self.__generator_step(
                     optimizers['generator'], x_batch, y_batch
                 )
 
-                # saving losses
-                losses['loss_x_dis'].append(loss_x_d)
-                losses['loss_y_dis'].append(loss_y_d)
-                losses['loss_gen'].append(loss_gen)
+                loss_x_d += loss_x_d_batch
+                loss_y_d += loss_y_d_batch
+                loss_gen += loss_gen_batch
+
+            # saving losses
+            losses['loss_x_dis'].append(loss_x_d / len(train_loader_y))
+            losses['loss_y_dis'].append(loss_y_d / len(train_loader_y))
+            losses['loss_gen'].append(loss_gen / len(train_loader_y))
 
         return losses
+
+        # TODO: implement training loop for loaders with different sizes
+        # TODO: add calculating val losses
