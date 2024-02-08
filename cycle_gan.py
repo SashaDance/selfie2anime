@@ -26,9 +26,9 @@ class CycleGAN:
         self.gen_YX = Generator(in_channels, filters, num_resid).to(device)
 
         # discriminator of X images
-        self.dis_X = Discriminator(in_channels, filters)
+        self.dis_X = Discriminator(in_channels, filters).to(device)
         # discriminator of Y images
-        self.dis_Y = Discriminator(in_channels, filters)
+        self.dis_Y = Discriminator(in_channels, filters).to(device)
 
     @staticmethod
     def cycle_consistency_loss(reconstructed: torch.Tensor,
