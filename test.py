@@ -90,28 +90,34 @@ def test_train_loop(left_ind: int = 0,
     losses = model.train(epochs, 1, optimizers, loader_x, loader_y)
     print(losses)
 
+def test_wm_to_an(model_path: str,
+                  left_ind: int = 0,
+                  right_ind: int = 3,
+                  save_path: str = 'data/samples/') -> None:
+    model = Generator()
+    model.load_state_dict(torch.load(
+        model_path,
+        map_location=torch.device('cpu')
+    ))
+    model.eval()
+
+    female_test = ImageDataset('testA')
+    images = female_test[left_ind: right_ind]
+
+    for i in range(len(images)):
+        image = images[i] * 0.5 + 0.5  # denormalization
+        torchvision.utils.save_image(image, os.path.join(save_path,
+                                                         f'im_wm_{i}.png'))
+        output = model(images[i]) * 0.5 + 0.5  # denormalization
+        torchvision.utils.save_image(output, os.path.join(save_path,
+                                                         f'im_anm_{i}.png'))
 
 def main() -> None:
     test_image_dataset()
     test_generator()
     test_discriminator()
     # test_train_loop()
-
-    model = Generator()
-    model.load_state_dict(torch.load(
-        'model_checkpoints/epoch_5/gen_XY',
-        map_location=torch.device('cpu')
-    ))
-    model.eval()
-
-    female_test = ImageDataset('testA')
-    images = female_test[0: 3]
-
-    for i in range(len(images)):
-        image = images[i] * 0.5 + 0.5
-        torchvision.utils.save_image(image, f'data/samples/wm_anime_{i}.png')
-        output = model(images[i])
-        torchvision.utils.save_image(output, f'data/samples/im_anime_{i}.png')
+    test_wm_to_an('model_checkpoints/epoch_5/gen_XY')
 
 
 if __name__ == '__main__':
