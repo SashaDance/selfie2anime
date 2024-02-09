@@ -7,6 +7,10 @@ import config
 import torch
 import os
 from torch.utils.data import DataLoader
+import matplotlib.pyplot as plt
+import numpy as np
+import torchvision
+from PIL import Image
 
 
 def test_image_dataset(in_channels: int = 3, image_size: int = 128) -> None:
@@ -91,7 +95,23 @@ def main() -> None:
     test_image_dataset()
     test_generator()
     test_discriminator()
-    test_train_loop()
+    # test_train_loop()
+
+    model = Generator()
+    model.load_state_dict(torch.load(
+        'model_checkpoints/epoch_5/gen_XY',
+        map_location=torch.device('cpu')
+    ))
+    model.eval()
+
+    female_test = ImageDataset('testA')
+    images = female_test[0: 3]
+
+    for i in range(len(images)):
+        image = images[i] * 0.5 + 0.5
+        torchvision.utils.save_image(image, f'data/samples/wm_anime_{i}.png')
+        output = model(images[i])
+        torchvision.utils.save_image(output, f'data/samples/im_anime_{i}.png')
 
 
 if __name__ == '__main__':

@@ -223,6 +223,8 @@ class CycleGAN:
 
         return losses
 
+        # TODO: add printing number of epoch
+        # TODO: add handling exceptions when saving the model
         # TODO: implement training loop for loaders with different sizes
         # TODO: add calculating val losses
         # TODO: implement buffer
