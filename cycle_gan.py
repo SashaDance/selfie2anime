@@ -180,6 +180,7 @@ class CycleGAN:
             loss_x_d = 0
             loss_y_d = 0
             loss_gen = 0
+            print(f'Epoch: {epoch}')
             for x_batch, y_batch in tqdm(zip(train_loader_y, train_loader_x)):
                 x_batch = x_batch.to(self.device)
                 y_batch = y_batch.to(self.device)
@@ -198,23 +199,30 @@ class CycleGAN:
 
             # saving model checkpoint
             if epoch % save_rate == 0:
-                os.mkdir(os.path.join(config.SAVE_PATH, f'epoch_{epoch}'))
-                torch.save(
-                    self.dis_X.state_dict(),
-                    os.path.join(config.SAVE_PATH, f'epoch_{epoch}/dis_X')
-                )
-                torch.save(
-                    self.dis_Y.state_dict(),
-                    os.path.join(config.SAVE_PATH, f'epoch_{epoch}/dis_Y')
-                )
-                torch.save(
-                    self.gen_XY.state_dict(),
-                    os.path.join(config.SAVE_PATH, f'epoch_{epoch}/gen_XY')
-                )
-                torch.save(
-                    self.gen_YX.state_dict(),
-                    os.path.join(config.SAVE_PATH, f'epoch_{epoch}/gen_YX')
-                )
+                save_dir = os.path.join(config.SAVE_PATH, f'epoch_{epoch}')
+                try:
+                    os.mkdir(save_dir)
+                    torch.save(
+                        self.dis_X.state_dict(),
+                        os.path.join(save_dir, 'dis_X')
+                    )
+                    torch.save(
+                        self.dis_Y.state_dict(),
+                        os.path.join(save_dir, 'dis_Y')
+                    )
+                    torch.save(
+                        self.gen_XY.state_dict(),
+                        os.path.join(save_dir, 'gen_XY')
+                    )
+                    torch.save(
+                        self.gen_YX.state_dict(),
+                        os.path.join(save_dir, 'gen_YX')
+                    )
+                except FileExistsError:
+                    print(
+                        f'Unable to save checkpoint on epoch {epoch}: ',
+                        f'dir {save_dir} already exists'
+                    )
 
             # saving losses
             losses['loss_x_dis'].append(loss_x_d / len(train_loader_y))
@@ -224,7 +232,6 @@ class CycleGAN:
         return losses
 
         # TODO: add printing number of epoch
-        # TODO: add handling exceptions when saving the model
         # TODO: implement training loop for loaders with different sizes
         # TODO: add calculating val losses
         # TODO: implement buffer

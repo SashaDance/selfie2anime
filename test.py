@@ -58,7 +58,7 @@ def test_discriminator(in_channels: int = 3, image_size: int = 128,
 
 def test_train_loop(left_ind: int = 0,
                     right_ind: int = 5,
-                    epochs: int = 10) -> None:
+                    epochs: int = 2) -> None:
     female_tr = ImageDataset('trainA')
     anime_tr = ImageDataset('trainB')
 
@@ -110,14 +110,14 @@ def test_wm_to_an(model_path: str,
                                                          f'im_wm_{i}.png'))
         output = model(images[i]) * 0.5 + 0.5  # denormalization
         torchvision.utils.save_image(output, os.path.join(save_path,
-                                                         f'im_anm_{i}.png'))
+                                                          f'im_anm_{i}.png'))
 
 def main() -> None:
     test_image_dataset()
     test_generator()
     test_discriminator()
-    # test_train_loop()
-    test_wm_to_an('model_checkpoints/epoch_5/gen_XY')
+    test_train_loop()
+    # test_wm_to_an('model_checkpoints/epoch_5/gen_XY')
 
 
 if __name__ == '__main__':
