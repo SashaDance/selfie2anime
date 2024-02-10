@@ -90,9 +90,11 @@ def test_train_loop(left_ind: int = 0,
     losses = model.train(epochs, 1, optimizers, loader_x, loader_y)
     print(losses)
 
-def test_wm_to_an(model_path: str,
+
+def test_generation(model_path: str,
                   left_ind: int = 0,
                   right_ind: int = 3,
+                  x_to_y: bool = True,
                   save_path: str = 'data/samples/') -> None:
     model = Generator()
     model.load_state_dict(torch.load(
@@ -101,8 +103,11 @@ def test_wm_to_an(model_path: str,
     ))
     model.eval()
 
-    female_test = ImageDataset('testA')
-    images = female_test[left_ind: right_ind]
+    if x_to_y:
+        test_images = ImageDataset('testA')
+    else:
+        test_images = ImageDataset('testB')
+    images = test_images[left_ind: right_ind]
 
     for i in range(len(images)):
         image = images[i] * 0.5 + 0.5  # denormalization
@@ -112,12 +117,13 @@ def test_wm_to_an(model_path: str,
         torchvision.utils.save_image(output, os.path.join(save_path,
                                                           f'im_anm_{i}.png'))
 
+
 def main() -> None:
     test_image_dataset()
     test_generator()
     test_discriminator()
-    test_train_loop()
-    # test_wm_to_an('model_checkpoints/epoch_5/gen_XY')
+    # test_train_loop()
+    test_generation('model_checkpoints/epoch_35/gen_XY(3)')
 
 
 if __name__ == '__main__':
