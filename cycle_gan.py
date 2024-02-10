@@ -145,8 +145,8 @@ class CycleGAN:
         loss = (
             fake_x_loss
             + fake_y_loss
-            + consistency_loss_x
-            + consistency_loss_y
+            + config.LAMBDA * consistency_loss_x
+            + config.LAMBDA * consistency_loss_y
         )
 
         loss.backward()
