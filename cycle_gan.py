@@ -67,7 +67,7 @@ class CycleGAN:
 
         # teaching discriminator to detect fake images
         fake_x = self.gen_XY(x_batch)
-        fake_x_preds = self.dis_X(fake_x)
+        fake_x_preds = self.dis_Y(fake_x)
 
         fake_x_loss = torch.mean(
             (fake_x_preds - 0) ** 2  # 0 is for the fake images
@@ -88,7 +88,7 @@ class CycleGAN:
 
         # teaching discriminator to detect fake images
         fake_y = self.gen_YX(y_batch)
-        fake_y_preds = self.dis_Y(fake_y)
+        fake_y_preds = self.dis_X(fake_y)
 
         fake_y_loss = torch.mean(
             (fake_y_preds - 0) ** 2  # 0 is for the fake images
@@ -116,7 +116,7 @@ class CycleGAN:
 
         # teaching generator to 'fool' discriminator
         fake_x = self.gen_XY(x_batch)
-        fake_x_preds = self.dis_X(fake_x)
+        fake_x_preds = self.dis_Y(fake_x)
 
         fake_x_loss = torch.mean(
             (fake_x_preds - 1) ** 2  # 1 is for the real images
@@ -131,7 +131,7 @@ class CycleGAN:
 
         # teaching generator to 'fool' discriminator
         fake_y = self.gen_YX(y_batch)
-        fake_y_preds = self.dis_Y(fake_y)
+        fake_y_preds = self.dis_X(fake_y)
 
         fake_y_loss = torch.mean(
             (fake_y_preds - 1) ** 2  # 1 is for the real images
@@ -231,6 +231,7 @@ class CycleGAN:
 
         return losses
 
+        # TODO: change variables names for x_fake
         # TODO: add printing number of epoch
         # TODO: implement training loop for loaders with different sizes
         # TODO: add calculating val losses

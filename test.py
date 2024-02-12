@@ -92,10 +92,10 @@ def test_train_loop(left_ind: int = 0,
 
 
 def test_generation(model_path: str,
-                  left_ind: int = 0,
-                  right_ind: int = 3,
-                  x_to_y: bool = True,
-                  save_path: str = 'data/samples/') -> None:
+                    left_ind: int = 0,
+                    right_ind: int = 3,
+                    x_to_y: bool = True,
+                    save_path: str = 'data/samples/') -> None:
     model = Generator()
     model.load_state_dict(torch.load(
         model_path,
