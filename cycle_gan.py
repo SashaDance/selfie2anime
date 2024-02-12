@@ -186,11 +186,11 @@ class CycleGAN:
                 y_batch = y_batch.to(self.device)
 
                 # updating weights and calculating losses
-                loss_x_d_batch, loss_y_d_batch = self.__discriminator_step(
-                    optimizers['discriminator'], x_batch, y_batch
-                )
                 loss_gen_batch = self.__generator_step(
                     optimizers['generator'], x_batch, y_batch
+                )
+                loss_x_d_batch, loss_y_d_batch = self.__discriminator_step(
+                    optimizers['discriminator'], x_batch, y_batch
                 )
 
                 loss_x_d += loss_x_d_batch
