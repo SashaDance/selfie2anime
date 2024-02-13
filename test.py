@@ -73,10 +73,10 @@ def test_train_loop(left_ind: int = 0,
     model = CycleGAN(device)
 
     discriminator_params = (
-            list(model.dis_X.parameters()) + list(model.dis_Y.parameters())
+        list(model.dis_X.parameters()) + list(model.dis_Y.parameters())
     )
     generator_params = (
-            list(model.gen_XY.parameters()) + list(model.gen_YX.parameters())
+        list(model.gen_XY.parameters()) + list(model.gen_YX.parameters())
     )
     optimizers = {
         'discriminator': torch.optim.Adam(
@@ -92,8 +92,8 @@ def test_train_loop(left_ind: int = 0,
 
 
 def test_generation(model_path: str,
-                    left_ind: int = 0,
-                    right_ind: int = 3,
+                    left_ind: int = 3,
+                    right_ind: int = 5,
                     x_to_y: bool = True,
                     save_path: str = 'data/samples/') -> None:
     model = Generator()
@@ -123,7 +123,7 @@ def main() -> None:
     test_generator()
     test_discriminator()
     # test_train_loop()
-    test_generation('model_checkpoints/epoch_35/gen_XY(3)')
+    test_generation('model_checkpoints/epoch_25/gen_XY(4)')
 
 
 if __name__ == '__main__':
