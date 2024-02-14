@@ -6,7 +6,6 @@ import os
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from torch.optim import Optimizer
-import torch.nn as nn
 import torch
 
 
@@ -54,9 +53,8 @@ class CycleGAN:
         :param y_batch:
         :return: losses
         """
-        optimizer.zero_grad()
-
         # discriminator X
+        optimizer.zero_grad()
 
         # teaching discriminator to detect real (from X) images
         real_x_preds = self.dis_X(x_batch)
@@ -79,6 +77,7 @@ class CycleGAN:
         optimizer.step()
 
         # discriminator Y
+        optimizer.zero_grad()
 
         # teaching Y discriminator to detect real (from Y) images
         real_y_preds = self.dis_Y(y_batch)
@@ -231,6 +230,7 @@ class CycleGAN:
 
         return losses
 
+        # TODO: add saving model when val loss is min
         # TODO: change variables names for x_fake
         # TODO: add printing number of epoch
         # TODO: implement training loop for loaders with different sizes
