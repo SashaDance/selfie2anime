@@ -181,7 +181,7 @@ class CycleGAN:
             loss_y_d = 0
             loss_gen = 0
             print(f'Epoch: {epoch}')
-            for x_batch, y_batch in tqdm(zip(train_loader_y, train_loader_x)):
+            for x_batch, y_batch in tqdm(zip(train_loader_x, train_loader_y)):
                 x_batch = x_batch.to(self.device)
                 y_batch = y_batch.to(self.device)
 
