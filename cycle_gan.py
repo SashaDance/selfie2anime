@@ -44,7 +44,7 @@ class CycleGAN:
 
         return torch.mean(torch.abs(real - reconstructed))
 
-    def __discriminator_step(self, optimizer: Optimizer,
+    def __discriminator_step(self, optimizers: dict[str, Optimizer],
                              x_batch: torch.Tensor,
                              y_batch: torch.Tensor) -> list[float, float]:
         """
@@ -54,7 +54,7 @@ class CycleGAN:
         :return: losses
         """
         # discriminator X
-        optimizer.zero_grad()
+        optimizers['discriminator_x'].zero_grad()
 
         # teaching discriminator to detect real (from X) images
         real_x_preds = self.dis_X(x_batch)
@@ -74,10 +74,10 @@ class CycleGAN:
         # updating weights for discriminator
         loss_x = real_x_loss + generated_x_loss
         loss_x.backward()
-        optimizer.step()
+        optimizers['discriminator_x'].step()
 
         # discriminator Y
-        optimizer.zero_grad()
+        optimizers['discriminator_y'].zero_grad()
 
         # teaching Y discriminator to detect real (from Y) images
         real_y_preds = self.dis_Y(y_batch)
@@ -96,7 +96,7 @@ class CycleGAN:
         # updating weights for discriminator
         loss_y = real_y_loss + generated_y_loss
         loss_y.backward()
-        optimizer.step()
+        optimizers['discriminator_y'].step()
 
         return [loss_x.item(), loss_y.item()]
 
@@ -189,7 +189,7 @@ class CycleGAN:
                     optimizers['generator'], x_batch, y_batch
                 )
                 loss_x_d_batch, loss_y_d_batch = self.__discriminator_step(
-                    optimizers['discriminator'], x_batch, y_batch
+                    optimizers, x_batch, y_batch
                 )
 
                 loss_x_d += loss_x_d_batch

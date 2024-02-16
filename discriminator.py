@@ -27,7 +27,7 @@ class Discriminator(nn.Module):
     Discriminator of CycleGAN model,
     architecture is the same as in the original paper
     """
-    def __init__(self, in_channels: int = 3, filters: int = 32):
+    def __init__(self, in_channels: int = 3, filters: int = 64):
         super().__init__()
 
         self.conv0 = nn.Sequential(
