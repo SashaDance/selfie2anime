@@ -31,7 +31,7 @@ class CycleGAN:
 
     @staticmethod
     def cycle_consistency_loss(reconstructed: torch.Tensor,
-                                real: torch.Tensor) -> torch.Tensor:
+                               real: torch.Tensor) -> torch.Tensor:
         """
         We want mapping (generators) F from X to Y and G from X to Y
         to be inverses to each other: F^(-1) = G and G^(-1) = F

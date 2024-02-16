@@ -20,7 +20,6 @@ class ImageDataset(Dataset):
 
         self.transform = transforms.Compose([
             transforms.Resize(image_size),
-            transforms.RandomHorizontalFlip(p=0.5),  # data augmentation
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.5] * in_channels,
                                  std=[0.5] * in_channels)
