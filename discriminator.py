@@ -1,5 +1,6 @@
 import torch.nn as nn
-
+import torch.nn.functional as F
+import torch
 
 class ConvLayer(nn.Module):
 
@@ -11,8 +12,7 @@ class ConvLayer(nn.Module):
             nn.Conv2d(
                 in_channels, out_channels,
                 kernel_size=4, padding=1,
-                stride=stride, padding_mode='reflect',
-                **kwargs
+                stride=stride, **kwargs
             ),
             nn.InstanceNorm2d(out_channels),
             nn.LeakyReLU(0.2)
@@ -27,13 +27,12 @@ class Discriminator(nn.Module):
     Discriminator of CycleGAN model,
     architecture is the same as in the original paper
     """
-    def __init__(self, in_channels: int = 3, filters: int = 64):
+    def __init__(self, in_channels: int = 3, filters: int = 32):
         super().__init__()
 
         self.conv0 = nn.Sequential(
             nn.Conv2d(
-                in_channels, filters, kernel_size=4, stride=2,
-                padding=1, padding_mode='reflect'
+                in_channels, filters, kernel_size=4, stride=2, padding=1
             ),
             nn.LeakyReLU(0.2)
         )
@@ -49,8 +48,7 @@ class Discriminator(nn.Module):
 
         self.last = nn.Sequential(
             nn.Conv2d(
-                filters * 8, 1, kernel_size=4, stride=1,
-                padding=1, padding_mode='reflect'
+                filters * 8, 1, kernel_size=4, stride=1, padding=1
             ),
             nn.Sigmoid()  # we need a probabilities for each patch
         )
