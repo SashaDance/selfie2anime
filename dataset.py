@@ -5,6 +5,16 @@ from torchvision import transforms
 import torch
 from PIL import Image
 import os
+import numpy as np
+
+
+def process_img_to_show(image: torch.Tensor) -> np.ndarray:
+    image = image.detach().cpu().numpy()
+    # scale from 0 to 255
+    image = ((image - image.min()) * 255) / (image.max() - image.min())
+    image = image.transpose(1, 2, 0).astype(np.uint8)
+
+    return image
 
 
 class ImageDataset(Dataset):

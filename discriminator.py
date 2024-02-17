@@ -2,6 +2,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch
 
+
 class ConvLayer(nn.Module):
 
     def __init__(self, in_channels: int, out_channels: int,
@@ -27,6 +28,7 @@ class Discriminator(nn.Module):
     Discriminator of CycleGAN model,
     architecture is the same as in the original paper
     """
+
     def __init__(self, in_channels: int = 3, filters: int = 64):
         super().__init__()
 
