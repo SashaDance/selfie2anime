@@ -1,5 +1,6 @@
 from discriminator import Discriminator
 from generator import Generator
+from dataset import ImageDataset, process_img_to_show
 import config
 
 import os
@@ -7,6 +8,8 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 from torch.optim import Optimizer
 import torch
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 class CycleGAN:
@@ -157,13 +160,19 @@ class CycleGAN:
               save_rate: int,
               optimizers: dict[str, Optimizer],
               train_loader_x: DataLoader,
-              train_loader_y: DataLoader,) -> dict[str, list]:
+              train_loader_y: DataLoader,
+              test_dataset_x: ImageDataset,
+              test_dataset_y: ImageDataset,
+              show_images: bool = True) -> dict[str, list]:
         """
         :param epochs:
         :param save_rate: save model every save_rate epochs
         :param optimizers:
         :param train_loader_x:
         :param train_loader_y:
+        :param test_dataset_x:
+        :param test_dataset_y:
+        :param show_images: show current results or not
         :return: dict with losses
         """
 
@@ -195,6 +204,28 @@ class CycleGAN:
                 loss_x_d += loss_x_d_batch
                 loss_y_d += loss_y_d_batch
                 loss_gen += loss_gen_batch
+
+            # showing the images
+            if show_images:
+                ind_x = np.random.randint(low=0, high=len(test_dataset_x))
+                ind_y = np.random.randint(low=0, high=len(test_dataset_y))
+
+                image_x = test_dataset_x[ind_x]
+                image_y = test_dataset_x[ind_y]
+                generated_y = self.gen_XY(image_x.to(self.device))
+                generated_x = self.gen_YX(image_y.to(self.device))
+
+                fig, ax = plt.subplots(2, 2)
+                ax[0][0].imshow(process_img_to_show(image_x))
+                ax[0][0].axis('off')
+                ax[0][1].imshow(process_img_to_show(generated_y))
+                ax[0][1].axis('off')
+                ax[1][0].imshow(process_img_to_show(image_y))
+                ax[1][0].axis('off')
+                ax[1][1].imshow(process_img_to_show(generated_x))
+                ax[1][1].axis('off')
+
+                plt.show()
 
             # saving model checkpoint
             if epoch % save_rate == 0:
