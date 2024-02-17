@@ -188,7 +188,6 @@ class CycleGAN:
             loss_x_d = 0
             loss_y_d = 0
             loss_gen = 0
-            print(f'Epoch: {epoch}')
             for x_batch, y_batch in tqdm(zip(train_loader_x, train_loader_y)):
                 x_batch = x_batch.to(self.device)
                 y_batch = y_batch.to(self.device)
@@ -254,10 +253,18 @@ class CycleGAN:
                         f'dir {save_dir} already exists'
                     )
 
+            loss_x_d = loss_x_d / len(train_loader_y)
+            loss_y_d = loss_y_d / len(train_loader_y)
+            loss_gen = loss_gen / len(train_loader_y)
+            # printing losses
+            print(
+                f'Epoch - {epoch} | dis_x_loss: {loss_x_d}, ',
+                f'dis_y_loss: {loss_y_d} | gen_loss: {loss_gen}'
+            )
             # saving losses
-            losses['loss_x_dis'].append(loss_x_d / len(train_loader_y))
-            losses['loss_y_dis'].append(loss_y_d / len(train_loader_y))
-            losses['loss_gen'].append(loss_gen / len(train_loader_y))
+            losses['loss_x_dis'].append(loss_x_d)
+            losses['loss_y_dis'].append(loss_y_d)
+            losses['loss_gen'].append(loss_gen)
 
         return losses
 
