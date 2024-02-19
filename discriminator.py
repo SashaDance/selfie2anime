@@ -62,7 +62,7 @@ class Discriminator(nn.Module):
         x = self.conv2(x)
         x = self.conv3(x)
 
-        # probabilities
+        # probabilities for each patch
         x = self.last(x)
 
         return x

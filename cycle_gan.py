@@ -210,7 +210,7 @@ class CycleGAN:
                 ind_y = np.random.randint(low=0, high=len(test_dataset_y))
 
                 image_x = test_dataset_x[ind_x]
-                image_y = test_dataset_x[ind_y]
+                image_y = test_dataset_y[ind_y]
                 generated_y = self.gen_XY(image_x.to(self.device))
                 generated_x = self.gen_YX(image_y.to(self.device))
 
@@ -269,8 +269,6 @@ class CycleGAN:
         return losses
 
         # TODO: add saving model when val loss is min
-        # TODO: change variables names for x_fake
-        # TODO: add printing number of epoch
         # TODO: implement training loop for loaders with different sizes
         # TODO: add calculating val losses
         # TODO: implement buffer
