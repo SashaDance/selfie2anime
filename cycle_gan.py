@@ -19,18 +19,33 @@ class CycleGAN:
     def __init__(self, device: torch.device,
                  in_channels: int = 3,
                  filters: int = 64,
-                 num_resid: int = 6):
+                 num_resid: int = 6,
+                 init_dir: str = None):
         self.device = device
 
         # generator from X to Y
         self.gen_XY = Generator(in_channels, filters, num_resid).to(device)
-        # generator from X to Y
+        # generator from Y to X
         self.gen_YX = Generator(in_channels, filters, num_resid).to(device)
 
-        # discriminator of X images
+        # discriminator X
         self.dis_X = Discriminator(in_channels, filters).to(device)
-        # discriminator of Y images
+        # discriminator Y
         self.dis_Y = Discriminator(in_channels, filters).to(device)
+
+        if init_dir:
+            self.gen_XY.load_state_dict(
+                torch.load(os.path.join(init_dir, 'gen_XY'))
+            )
+            self.gen_YX.load_state_dict(
+                torch.load(os.path.join(init_dir, 'gen_YX'))
+            )
+            self.dis_X.load_state_dict(
+                torch.load(os.path.join(init_dir, 'dis_X'))
+            )
+            self.dis_Y.load_state_dict(
+                torch.load(os.path.join(init_dir, 'dis_Y'))
+            )
 
     @staticmethod
     def cycle_consistency_loss(reconstructed: torch.Tensor,
