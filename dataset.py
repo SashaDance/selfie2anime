@@ -60,8 +60,6 @@ class ImageBuffer:
         :param buffer_lim: max size of buffer
         :param prob_threshold: probability of putting new image to buffer
         """
-        # assert config.BATCH_SIZE <= buffer_lim, \
-        #     'Buffer limit should be greater than the batch size'
         self.buffer_lim = buffer_lim
         self.prob_threshold = prob_threshold
         self.buffer = torch.Tensor()
@@ -71,6 +69,9 @@ class ImageBuffer:
         :param image_batch: current generated image barch
         :return: image batch after sampling from buffer
         """
+        assert len(image_batch) <= self.buffer_lim, \
+            'Buffer limit should be greater than the batch size'
+
         # initializing of buffer
         if len(self.buffer) < self.buffer_lim:
             self.buffer = torch.cat((self.buffer, image_batch), 0)
