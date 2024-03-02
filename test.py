@@ -1,4 +1,4 @@
-from dataset import ImageDataset, process_img_to_show
+from dataset import ImageDataset, process_img_to_show, ImageBuffer
 from generator import Generator
 from discriminator import Discriminator
 from cycle_gan import CycleGAN
@@ -78,7 +78,7 @@ def test_train_loop(left_ind: int = 0,
     discriminator_params_x = list(model.dis_X.parameters())
     discriminator_params_y = list(model.dis_Y.parameters())
     generator_params = (
-        list(model.gen_XY.parameters()) + list(model.gen_YX.parameters())
+            list(model.gen_XY.parameters()) + list(model.gen_YX.parameters())
     )
     optimizers = {
         'discriminator_x': torch.optim.Adam(
@@ -126,12 +126,44 @@ def test_generation(model_path: str,
     # TODO: add moving images to device on inference
 
 
+def test_image_buffer(batch_size: int = 5):
+    dataloader = DataLoader(ImageDataset('trainA')[0:20], batch_size=batch_size)
+    buffer = ImageBuffer(buffer_lim=10)
+    model = Generator()
+    model.load_state_dict(torch.load(
+        'model_checkpoints/epoch_20/gen_XY(3)',
+        map_location=torch.device('cpu')
+    ))
+    for image_batch in dataloader:
+        fig, ax = plt.subplots(batch_size, 2)
+        images = model(image_batch)
+        images = buffer.get_images(images)
+        for i in range(batch_size):
+            image_1 = process_img_to_show(images[i])
+            image_2 = process_img_to_show(image_batch[i])
+            ax[i][0].imshow(image_1)
+            ax[i][0].axis('off')
+            ax[i][1].imshow(image_2)
+            ax[i][1].axis('off')
+
+        plt.show()
+
+    fig, ax = plt.subplots(len(buffer.buffer), 1)
+    for i, image in enumerate(buffer.buffer):
+        image = process_img_to_show(image)
+        ax[i].imshow(image)
+        ax[i].axis('off')
+
+    plt.show()
+
+# TODO: add test of ImageBuffer and check what len of new images is 0
 def main() -> None:
     test_image_dataset()
     test_generator()
     test_discriminator()
     # test_train_loop()
-    test_generation('model_checkpoints/epoch_20/gen_XY(3)')
+    # test_generation('model_checkpoints/epoch_20/gen_XY(3)')
+    test_image_buffer()
 
 
 if __name__ == '__main__':
