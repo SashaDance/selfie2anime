@@ -69,9 +69,6 @@ class ImageBuffer:
         :param image_batch: current generated image barch
         :return: image batch after sampling from buffer
         """
-        assert len(image_batch) <= self.buffer_lim, \
-            'Buffer limit should be greater than the batch size'
-
         # initializing of buffer
         if len(self.buffer) < self.buffer_lim:
             self.buffer = torch.cat((self.buffer, image_batch), 0)
@@ -83,9 +80,10 @@ class ImageBuffer:
         mask = (prob > self.prob_threshold).int()
         new_images = image_batch[(mask == 1).nonzero().squeeze()]
         # replacing previous images with new images
-        # using random permutation to choice without replacement
-        ind_to_rpl = torch.randperm(self.buffer_lim)[:len(new_images)]
-        self.buffer[ind_to_rpl] = new_images
+        if len(new_images) != 0:
+            # using random permutation to choice without replacement
+            ind_to_rpl = torch.randperm(self.buffer_lim)[:len(new_images)]
+            self.buffer[ind_to_rpl] = new_images
 
         # sampling images from buffer
         ind = torch.randperm(self.buffer_lim)[:len(image_batch)]
