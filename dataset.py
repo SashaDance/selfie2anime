@@ -60,28 +60,35 @@ class ImageBuffer:
         :param buffer_lim: max size of buffer
         :param prob_threshold: probability of putting new image to buffer
         """
-        assert config.BATCH_SIZE <= buffer_lim, \
-            'Buffer limit should be greater than the batch size'
+        # assert config.BATCH_SIZE <= buffer_lim, \
+        #     'Buffer limit should be greater than the batch size'
         self.buffer_lim = buffer_lim
         self.prob_threshold = prob_threshold
         self.buffer = torch.Tensor()
 
-    def get_image(self, image_batch: torch.Tensor) -> torch.Tensor:
+    def get_images(self, image_batch: torch.Tensor) -> torch.Tensor:
         """
         :param image_batch: current generated image barch
         :return: image batch after sampling from buffer
         """
         # initializing of buffer
-        if len(self.buffer) <= self.buffer_lim:
+        if len(self.buffer) < self.buffer_lim:
             self.buffer = torch.cat((self.buffer, image_batch), 0)
-            print(self.buffer.size())
+            # just return the batch without doing anything
             return image_batch
-        else:
-            pass
 
+        # if i-th prob is > threshold add i-th image to buffer
+        prob = torch.rand(len(image_batch))
+        mask = (prob > self.prob_threshold).int()
+        new_images = image_batch[(mask == 1).nonzero().squeeze()]
+        # replacing previous images with new images
+        # using random permutation to choice without replacement
+        ind_to_rpl = torch.randperm(self.buffer_lim)[:len(new_images)]
+        self.buffer[ind_to_rpl] = new_images
 
-inst = ImageBuffer()
-batch_size = 5
-image_batch = torch.rand([batch_size, 3, 128, 128])
-inst.get_image(image_batch)
-inst.get_image(image_batch)
+        # sampling images from buffer
+        ind = torch.randperm(self.buffer_lim)[:len(image_batch)]
+
+        return self.buffer[ind]
+
+        # TODO: replace len() with torch.size
