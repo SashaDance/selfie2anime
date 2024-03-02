@@ -5,12 +5,8 @@ from cycle_gan import CycleGAN
 import config
 
 import torch
-import os
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-import numpy as np
-import torchvision
-from PIL import Image
 
 
 def test_image_dataset(in_channels: int = 3, image_size: int = 128) -> None:
@@ -161,9 +157,9 @@ def main() -> None:
     test_image_dataset()
     test_generator()
     test_discriminator()
-    # test_train_loop()
+    test_train_loop()
     # test_generation('model_checkpoints/epoch_20/gen_XY(3)')
-    test_image_buffer()
+    # test_image_buffer()
 
 
 if __name__ == '__main__':

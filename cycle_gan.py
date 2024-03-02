@@ -1,6 +1,6 @@
 from discriminator import Discriminator
 from generator import Generator
-from dataset import ImageDataset, process_img_to_show
+from dataset import ImageDataset, process_img_to_show, ImageBuffer
 import config
 
 import os
@@ -20,6 +20,7 @@ class CycleGAN:
                  in_channels: int = 3,
                  filters: int = 64,
                  num_resid: int = 6,
+                 use_buffer: bool = True,
                  init_dir: str = None):
         self.device = device
 
@@ -32,6 +33,11 @@ class CycleGAN:
         self.dis_X = Discriminator(in_channels, filters).to(device)
         # discriminator Y
         self.dis_Y = Discriminator(in_channels, filters).to(device)
+
+        self.use_buffer = use_buffer
+        if use_buffer:
+            self.generated_x_buffer = ImageBuffer()
+            self.generated_y_buffer = ImageBuffer()
 
         if init_dir:
             self.gen_XY.load_state_dict(
@@ -66,7 +72,7 @@ class CycleGAN:
                              x_batch: torch.Tensor,
                              y_batch: torch.Tensor) -> list[float, float]:
         """
-        :param optimizer: optimizer with weights from both discriminators
+        :param optimizers: optimizers with weights from both discriminators
         :param x_batch:
         :param y_batch:
         :return: losses
@@ -83,6 +89,9 @@ class CycleGAN:
 
         # teaching discriminator to detect fake (not from X) images
         generated_x = self.gen_YX(y_batch)
+        if self.use_buffer:
+            generated_x = self.generated_x_buffer.get_images(generated_x)
+
         generated_x_preds = self.dis_X(generated_x)
 
         generated_x_loss = torch.mean(
@@ -105,6 +114,9 @@ class CycleGAN:
 
         # teaching discriminator to detect fake (not from Y) images
         generated_y = self.gen_XY(x_batch)
+        if self.use_buffer:
+            generated_y = self.generated_y_buffer.get_images(generated_y)
+
         generated_y_preds = self.dis_Y(generated_y)
 
         generated_y_loss = torch.mean(
