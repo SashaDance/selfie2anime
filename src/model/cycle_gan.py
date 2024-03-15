@@ -70,13 +70,14 @@ class CycleGAN:
 
     def __discriminator_step(self, optimizers: dict[str, Optimizer],
                              x_batch: torch.Tensor,
-                             y_batch: torch.Tensor) -> list[float, float]:
+                             y_batch: torch.Tensor) -> dict[str, float]:
         """
         :param optimizers: optimizers with weights from both discriminators
         :param x_batch:
         :param y_batch:
         :return: losses
         """
+        stats = {}
         # discriminator X
         optimizers['discriminator_x'].zero_grad()
 
@@ -130,17 +131,23 @@ class CycleGAN:
         loss_y.backward()
         optimizers['discriminator_y'].step()
 
-        return [loss_x.item(), loss_y.item()]
+        stats['x_loss'] = loss_x.item()
+        stats['y_loss'] = loss_y.item()
+
+        return stats
 
     def __generator_step(self, optimizer: Optimizer,
                          x_batch: torch.Tensor,
-                         y_batch: torch.Tensor) -> float:
+                         y_batch: torch.Tensor) -> dict[str, float]:
         """
         :param optimizer: optimizer with weights from both generators
         :param x_batch:
         :param y_batch:
         :return: losses
         """
+
+        stats = {}
+
         optimizer.zero_grad()
 
         # generator from X to Y
@@ -183,7 +190,9 @@ class CycleGAN:
         loss.backward()
         optimizer.step()
 
-        return loss.item()
+        stats['loss'] = loss.item()
+
+        return stats
 
     def train(self, epochs: int,
               save_rate: int,
@@ -222,16 +231,16 @@ class CycleGAN:
                 y_batch = y_batch.to(self.device)
 
                 # updating weights and calculating losses
-                loss_gen_batch = self.__generator_step(
+                stat_gen = self.__generator_step(
                     optimizers['generator'], x_batch, y_batch
                 )
-                loss_x_d_batch, loss_y_d_batch = self.__discriminator_step(
+                stats_dis = self.__discriminator_step(
                     optimizers, x_batch, y_batch
                 )
 
-                loss_x_d += loss_x_d_batch
-                loss_y_d += loss_y_d_batch
-                loss_gen += loss_gen_batch
+                loss_x_d += stats_dis['x_loss']
+                loss_y_d += stats_dis['y_loss']
+                loss_gen += stat_gen['loss']
 
             # showing the images
             if show_images:
