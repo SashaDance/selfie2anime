@@ -194,6 +194,24 @@ class CycleGAN:
 
         return stats
 
+    def __save_weights(self, save_dir: str):
+        os.mkdir(save_dir)
+        torch.save(
+            self.dis_X.state_dict(),
+            os.path.join(save_dir, 'dis_X')
+        )
+        torch.save(
+            self.dis_Y.state_dict(),
+            os.path.join(save_dir, 'dis_Y')
+        )
+        torch.save(
+            self.gen_XY.state_dict(),
+            os.path.join(save_dir, 'gen_XY')
+        )
+        torch.save(
+            self.gen_YX.state_dict(),
+            os.path.join(save_dir, 'gen_YX')
+        )
     def train(self, epochs: int,
               save_rate: int,
               optimizers: dict[str, Optimizer],
@@ -268,23 +286,7 @@ class CycleGAN:
             if epoch % save_rate == 0:
                 save_dir = os.path.join(config.SAVE_PATH, f'epoch_{epoch}')
                 try:
-                    os.mkdir(save_dir)
-                    torch.save(
-                        self.dis_X.state_dict(),
-                        os.path.join(save_dir, 'dis_X')
-                    )
-                    torch.save(
-                        self.dis_Y.state_dict(),
-                        os.path.join(save_dir, 'dis_Y')
-                    )
-                    torch.save(
-                        self.gen_XY.state_dict(),
-                        os.path.join(save_dir, 'gen_XY')
-                    )
-                    torch.save(
-                        self.gen_YX.state_dict(),
-                        os.path.join(save_dir, 'gen_YX')
-                    )
+                    self.__save_weights(save_dir)
                 except FileExistsError:
                     print(
                         f'Unable to save checkpoint on epoch {epoch}: ',
