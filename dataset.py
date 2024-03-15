@@ -55,14 +55,15 @@ class ImageBuffer:
     to learn to fool the discriminator
     """
 
-    def __init__(self, buffer_lim: int = 64, prob_threshold: float = 0.5):
+    def __init__(self, device: torch.device,
+                 buffer_lim: int = 64, prob_threshold: float = 0.5):
         """
         :param buffer_lim: max size of buffer
         :param prob_threshold: probability of putting new image to buffer
         """
         self.buffer_lim = buffer_lim
         self.prob_threshold = prob_threshold
-        self.buffer = torch.Tensor()
+        self.buffer = torch.Tensor().to(device)
 
     def get_images(self, image_batch: torch.Tensor) -> torch.Tensor:
         """

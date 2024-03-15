@@ -36,8 +36,8 @@ class CycleGAN:
 
         self.use_buffer = use_buffer
         if use_buffer:
-            self.generated_x_buffer = ImageBuffer()
-            self.generated_y_buffer = ImageBuffer()
+            self.generated_x_buffer = ImageBuffer(self.device)
+            self.generated_y_buffer = ImageBuffer(self.device)
 
         if init_dir:
             self.gen_XY.load_state_dict(
@@ -298,4 +298,3 @@ class CycleGAN:
         # TODO: add saving model when val loss is min
         # TODO: implement training loop for loaders with different sizes
         # TODO: add calculating val losses
-        # TODO: implement buffer
