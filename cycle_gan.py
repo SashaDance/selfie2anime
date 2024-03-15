@@ -88,9 +88,10 @@ class CycleGAN:
         )
 
         # teaching discriminator to detect fake (not from X) images
-        generated_x = self.gen_YX(y_batch)
-        if self.use_buffer:
-            generated_x = self.generated_x_buffer.get_images(generated_x)
+        with torch.no_grad():
+            generated_x = self.gen_YX(y_batch)
+            if self.use_buffer:
+                generated_x = self.generated_x_buffer.get_images(generated_x)
 
         generated_x_preds = self.dis_X(generated_x)
 
@@ -113,9 +114,10 @@ class CycleGAN:
         )
 
         # teaching discriminator to detect fake (not from Y) images
-        generated_y = self.gen_XY(x_batch)
-        if self.use_buffer:
-            generated_y = self.generated_y_buffer.get_images(generated_y)
+        with torch.no_grad():
+            generated_y = self.gen_XY(x_batch)
+            if self.use_buffer:
+                generated_y = self.generated_y_buffer.get_images(generated_y)
 
         generated_y_preds = self.dis_Y(generated_y)
 
