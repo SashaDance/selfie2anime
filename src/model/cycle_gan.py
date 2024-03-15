@@ -16,6 +16,7 @@ class CycleGAN:
     """
     CycleGAN architecture consists of two Generators and two Discriminators
     """
+
     def __init__(self, device: torch.device,
                  in_channels: int = 3,
                  filters: int = 64,
@@ -97,7 +98,8 @@ class CycleGAN:
         generated_x_preds = self.dis_X(generated_x)
 
         generated_x_loss = torch.mean(
-            (generated_x_preds - 0) ** 2  # 0 is for the fake (not from X) images
+            (generated_x_preds - 0) ** 2
+            # 0 is for the fake (not from X) images
         )
 
         # updating weights for discriminator
@@ -123,7 +125,8 @@ class CycleGAN:
         generated_y_preds = self.dis_Y(generated_y)
 
         generated_y_loss = torch.mean(
-            (generated_y_preds - 0) ** 2  # 0 is for the fake (not from Y) images
+            (generated_y_preds - 0) ** 2
+            # 0 is for the fake (not from Y) images
         )
 
         # updating weights for discriminator
@@ -181,10 +184,10 @@ class CycleGAN:
         )
 
         loss = (
-            generated_y_loss
-            + generated_x_loss
-            + config.LAMBDA * consistency_loss_x
-            + config.LAMBDA * consistency_loss_y
+                generated_y_loss
+                + generated_x_loss
+                + config.LAMBDA * consistency_loss_x
+                + config.LAMBDA * consistency_loss_y
         )
 
         loss.backward()
@@ -212,6 +215,29 @@ class CycleGAN:
             self.gen_YX.state_dict(),
             os.path.join(save_dir, 'gen_YX')
         )
+
+    def __show_images(self, test_dataset_x: ImageDataset,
+                      test_dataset_y: ImageDataset):
+        ind_x = np.random.randint(low=0, high=len(test_dataset_x))
+        ind_y = np.random.randint(low=0, high=len(test_dataset_y))
+
+        image_x = test_dataset_x[ind_x]
+        image_y = test_dataset_y[ind_y]
+        generated_y = self.gen_XY(image_x.to(self.device))
+        generated_x = self.gen_YX(image_y.to(self.device))
+
+        fig, ax = plt.subplots(2, 2)
+        ax[0][0].imshow(process_img_to_show(image_x))
+        ax[0][0].axis('off')
+        ax[0][1].imshow(process_img_to_show(generated_y))
+        ax[0][1].axis('off')
+        ax[1][0].imshow(process_img_to_show(image_y))
+        ax[1][0].axis('off')
+        ax[1][1].imshow(process_img_to_show(generated_x))
+        ax[1][1].axis('off')
+
+        plt.show()
+
     def train(self, epochs: int,
               save_rate: int,
               optimizers: dict[str, Optimizer],
@@ -262,25 +288,7 @@ class CycleGAN:
 
             # showing the images
             if show_images:
-                ind_x = np.random.randint(low=0, high=len(test_dataset_x))
-                ind_y = np.random.randint(low=0, high=len(test_dataset_y))
-
-                image_x = test_dataset_x[ind_x]
-                image_y = test_dataset_y[ind_y]
-                generated_y = self.gen_XY(image_x.to(self.device))
-                generated_x = self.gen_YX(image_y.to(self.device))
-
-                fig, ax = plt.subplots(2, 2)
-                ax[0][0].imshow(process_img_to_show(image_x))
-                ax[0][0].axis('off')
-                ax[0][1].imshow(process_img_to_show(generated_y))
-                ax[0][1].axis('off')
-                ax[1][0].imshow(process_img_to_show(image_y))
-                ax[1][0].axis('off')
-                ax[1][1].imshow(process_img_to_show(generated_x))
-                ax[1][1].axis('off')
-
-                plt.show()
+                self.__show_images(test_dataset_x, test_dataset_y)
 
             # saving model checkpoint
             if epoch % save_rate == 0:
