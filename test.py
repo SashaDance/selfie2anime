@@ -1,8 +1,8 @@
-from dataset import ImageDataset, process_img_to_show, ImageBuffer
-from generator import Generator
-from discriminator import Discriminator
-from cycle_gan import CycleGAN
-import config
+from src.model.dataset import ImageDataset, process_img_to_show, ImageBuffer
+from src.model.generator import Generator
+from src.model.discriminator import Discriminator
+from src.model.cycle_gan import CycleGAN
+import src.model.config as config
 
 import torch
 from torch.utils.data import DataLoader
@@ -123,7 +123,8 @@ def test_generation(model_path: str,
 
 
 def test_image_buffer(batch_size: int = 5):
-    dataloader = DataLoader(ImageDataset('trainA')[0:20], batch_size=batch_size)
+    dataloader = DataLoader(ImageDataset('trainA')[0:20],
+                            batch_size=batch_size)
     buffer = ImageBuffer(buffer_lim=10)
     model = Generator()
     model.load_state_dict(torch.load(
@@ -152,7 +153,7 @@ def test_image_buffer(batch_size: int = 5):
 
     plt.show()
 
-# TODO: add test of ImageBuffer and check what len of new images is 0
+
 def main() -> None:
     test_image_dataset()
     test_generator()

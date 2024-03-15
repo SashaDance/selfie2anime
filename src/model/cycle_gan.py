@@ -1,7 +1,7 @@
-from discriminator import Discriminator
-from generator import Generator
-from dataset import ImageDataset, process_img_to_show, ImageBuffer
-import config
+from src.model.discriminator import Discriminator
+from src.model.generator import Generator
+from src.model.dataset import ImageDataset, process_img_to_show, ImageBuffer
+import src.model.config as config
 
 import os
 from tqdm import tqdm

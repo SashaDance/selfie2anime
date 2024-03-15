@@ -1,4 +1,4 @@
-import config
+import src.model.config as config
 
 from torch.utils.data import Dataset
 from torchvision import transforms
