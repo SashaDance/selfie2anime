@@ -76,7 +76,7 @@ class CycleGAN:
         :param optimizers: optimizers with weights from both discriminators
         :param x_batch:
         :param y_batch:
-        :return: losses
+        :return: statistics for experiments
         """
         stats = {}
         # discriminator X
@@ -146,7 +146,7 @@ class CycleGAN:
         :param optimizer: optimizer with weights from both generators
         :param x_batch:
         :param y_batch:
-        :return: losses
+        :return: statistics for experiments
         """
 
         stats = {}
@@ -197,7 +197,7 @@ class CycleGAN:
 
         return stats
 
-    def __save_weights(self, save_dir: str):
+    def save_weights(self, save_dir: str):
         os.mkdir(save_dir)
         torch.save(
             self.dis_X.state_dict(),
@@ -294,7 +294,7 @@ class CycleGAN:
             if epoch % save_rate == 0:
                 save_dir = os.path.join(config.SAVE_PATH, f'epoch_{epoch}')
                 try:
-                    self.__save_weights(save_dir)
+                    self.save_weights(save_dir)
                 except FileExistsError:
                     print(
                         f'Unable to save checkpoint on epoch {epoch}: ',

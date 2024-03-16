@@ -7,8 +7,10 @@ import src.model.config as config
 import torch
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
+import numpy as np
 
-
+np.random.seed(42)
+torch.manual_seed(42)
 def test_image_dataset(in_channels: int = 3, image_size: int = 128) -> None:
     female_tr = ImageDataset('trainA')
     anime_tr = ImageDataset('trainB')
@@ -91,7 +93,6 @@ def test_train_loop(left_ind: int = 0,
     losses = model.train(
         epochs, 1, optimizers, loader_x, loader_y, female_test, anime_test
     )
-    print(losses)
 
 
 def test_generation(model_path: str,

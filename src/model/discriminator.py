@@ -1,6 +1,4 @@
 import torch.nn as nn
-import torch.nn.functional as F
-import torch
 
 
 class ConvLayer(nn.Module):
@@ -52,7 +50,7 @@ class Discriminator(nn.Module):
             nn.Conv2d(
                 filters * 8, 1, kernel_size=4, stride=1, padding=1
             ),
-            nn.Sigmoid()  # we need a probabilities for each patch
+            nn.Sigmoid()  # probabilities for each patch
         )
 
     def forward(self, x):
