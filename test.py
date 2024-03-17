@@ -11,6 +11,10 @@ import numpy as np
 
 np.random.seed(42)
 torch.manual_seed(42)
+
+'''
+Tests that were used on development
+'''
 def test_image_dataset(in_channels: int = 3, image_size: int = 128) -> None:
     female_tr = ImageDataset('trainA')
     anime_tr = ImageDataset('trainB')
@@ -159,8 +163,8 @@ def main() -> None:
     test_image_dataset()
     test_generator()
     test_discriminator()
-    test_train_loop()
-    # test_generation('model_checkpoints/epoch_20/gen_XY(3)')
+    # test_train_loop()
+    test_generation('model_weights/gen_XY')
     # test_image_buffer()
 
 
