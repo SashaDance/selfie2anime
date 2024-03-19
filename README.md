@@ -1,6 +1,6 @@
 # selfie2anime
 
-The implementation of CycleGAN model to convert selfie images to anime images and vise versa
+From scratch implementation of CycleGAN model to convert selfie images to anime images and vise versa
 
 Original paper can be found [here](https://arxiv.org/abs/1703.10593)
 
